@@ -1,0 +1,272 @@
+
+
+*,::before,::after{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box !important;
+}
+
+:root {
+  --primary-color: rgb(20, 1, 249);
+  --secondary-color: rgba(178, 171, 171,0.3);
+  --tertiary-color:rgba(76,61,254,1);
+
+  /* other colors */
+  --danger-color: rgb(209, 0, 0);
+  --success-color:rgb(0,209,8);
+  --boring-light:rgb(0,0,0);
+  --boring-dark:rgb(255,255,255);
+  --boring-btn:var(--boring-light);
+  --surface-color:rgb(243,243,243);
+
+  --card-shadow: 4px 4px 4px 0px rgba(0, 0, 0, 0.15), 0px 0px 2px 0px rgba(0, 0, 0, 0.30), 4px 4px 30px 0px rgba(0, 0, 0, 0.12);
+  
+  /* interactions */
+  --main-hover:rgb(255,255,255);
+  --hover:rgb(235,235,235);
+  --pressed:rgb(225,225,225);
+
+  --background-light:rgb(255,255,255);
+  --background-dark: rgb(18,18,18);
+
+  --background-color: var(--background-light);
+
+  --text-light-h: rgba(0,0,0,0.83);
+  --text-light-m: rgba(0,0,0,0.6);
+  --text-light-l: rgba(0,0,0,0.3);
+
+  --border-light-h: rgba(0,0,0,0.2);
+  --border-light-l: rgba(0,0,0,0.1);
+
+  --text-dark-h: rgba(255,255,255,0.83);
+  --text-dark-m: rgba(255,255,255,0.6);
+  --text-dark-l: rgba(255,255,255,0.3);
+
+  --border-dark-h: rgba(255,255,255,0.2);
+  --border-dark-l: rgba(255,255,255,0.1);
+
+  --text-h: var(--text-light-h);
+  --text-m: var(--text-light-m);
+  --text-l: var(--text-light-l);
+  --border-h:var(--border-light-h);
+  --border-l: var(--border-light-l);
+
+  --nav:rgba(185, 183, 211, 1);
+  --nav-pos:10rem;
+}
+
+html{
+  font-size: 10px;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-light-h);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --boring-btn:var(--boring-dark);
+
+    --main-hover:rgb(0,0,0);
+    --hover:rgb(51,51,51);
+    --pressed:rgb(26,26,26);
+
+    --text-h: var(--text-dark-h);
+    --text-m: var(--text-dark-m);
+    --text-l: var(--text-dark-l);
+
+    --border-h:var(--border-dark-h);
+    --border-l: var(--border-dark-l);
+
+    --background-color: var(--background-dark);
+    --nav:rgba(185, 183, 211, 0.6);
+  }
+
+  body {
+    color: var(--text-dark-h);
+  }
+}
+
+/* Example usage of the primary and secondary colors */
+a, button {
+    text-transform: uppercase !important;
+    font-weight: 500 !important;
+    background-color: unset;
+    border: none;
+    cursor:pointer;
+    text-decoration: none;
+}
+
+
+.body-container {
+  padding: 10rem;
+  transition: margin 0.3s;
+  max-height:100%;
+}
+
+
+/* Small screens (phones) */
+@media only screen and (max-width: 600px) {
+  h1 {
+    font-size: 3.5rem !important; /* Adjust as needed */
+  }
+  h2 {
+    font-size: 3rem !important;
+  }
+  h3 {
+    font-size: 2.5rem !important;
+  }
+  h4 {
+    font-size: 2rem !important;
+  }
+  h5 {
+    font-size: 1.8rem !important;
+  }
+  h6 {
+    font-size: 1.6rem !important;
+  }
+  .text-xs{
+    font-size: 1.4rem !important;
+    line-height: 2.0rem !important;
+  }
+  p, a, span, li, button, input {
+    font-size: 1.4rem !important;
+  }
+  small{
+    font-size: 1.1rem !important;
+  }
+  .tag-name{
+    font-size: 1.6rem !important;
+    line-height: 1.4rem !important;
+  }
+}
+
+/* Medium screens (tablets) */
+@media only screen and (min-width: 601px) and (max-width: 1440px) {
+  h1 {
+    font-size: 7rem !important;
+  }
+  h2 {
+    font-size: 5rem !important;
+  }
+  h3 {
+    font-size: 4rem !important;
+  }
+  h4 {
+    font-size: 3rem !important;
+  }
+  h5 {
+    font-size: 2.5rem !important;
+  }
+  h6 {
+    font-size: 2rem !important;
+  }
+  .text-xs{
+    font-size: 1.2rem !important;
+    line-height: 1.8rem !important;
+  }
+  p, a, span, li, button, input {
+    font-size: 1.6rem !important;
+  }
+  small{
+    font-size: 1.3rem !important;
+  }
+  .tag-name{
+    font-size: 1.2rem !important;
+    line-height: 1.2rem !important;
+  }
+}
+
+/* Large screens (desktops) */
+@media only screen and (min-width: 1441px) {
+  h1 {
+    font-size: 10rem !important;
+  }
+  h2 {
+    font-size: 8rem !important;
+  }
+  h3 {
+    font-size: 6rem !important;
+  }
+  h4 {
+    font-size: 4rem !important;
+  }
+  h5 {
+    font-size: 3rem !important;
+  }
+  h6 {
+    font-size: 2.5rem !important;
+  }
+  p, a, span, li, button, input {
+    font-size: 1.6rem !important;
+  }
+  small{
+    font-size: 1.3rem !important;
+  }
+  .tag-name{
+    font-size: 1.2rem !important;
+    line-height: 1.2rem !important;
+  }
+  .text-xs{
+    font-size: 1.0rem !important;
+    line-height: 1.6rem !important;
+  }
+  .body-container {
+    max-width: 1200px;
+    margin: 8rem auto;
+  }
+}
+
+@media screen and (max-width: 1440px) {
+  .body-container {
+    padding: 8rem;
+  }
+  :root{
+    --nav-pos:8rem;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .body-container {
+    padding: 6rem;
+  }
+  :root{
+    --nav-pos:6rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .body-container {
+    padding: 4rem;
+  }
+  :root{
+    --create-proj : calc(100vw - 8rem);
+    --nav-pos:4rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .body-container {
+    padding: 2rem;
+  }
+  :root{
+    --create-proj : calc(100vw - 4rem);
+    --nav-pos:2rem;
+  }
+}
+
+::-webkit-scrollbar{
+  display: none;
+}
+
+.card{
+  box-shadow: var(--card-shadow);
+}
+
+/* Other styles for your webpage go here */
+  
+
+  
