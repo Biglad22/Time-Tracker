@@ -10,7 +10,7 @@
                         {{ tag }}
                     </template>
                 </tasktag>
-                <timer  v-if="!isCompleted" @updatePlaying="updateIsPlaying" :taskID="taskID"  :start="taskTime" :isTiming="isTiming" class=" hidden sm:flex"/>
+                <timer  v-if="!isCompleted" :taskID="taskID"  :start="taskTime" :isTiming="isTiming" class=" hidden sm:flex"/>
                 <p class="capitalize text-[var(--success-color)]" v-else>
                     Completed
                 </p>
@@ -35,7 +35,7 @@
                         Description: 
                         <slot name="task-desc"></slot>
                     </p>
-                    <timer :start="taskTime" v-if="!isCompleted" @updatePlaying="updateIsPlaying" :isTiming="isTiming" :isCompleted="isCompleted" :taskID="taskID"  class=" flex sm:hidden" />
+                    <timer :start="taskTime" v-if="!isCompleted" :isTiming="isTiming" :isCompleted="isCompleted" :taskID="taskID"  class=" flex sm:hidden" />
                 </div>
             </div>
         </Transition>
@@ -71,7 +71,6 @@ export default{
             hours:null,
             mins:null,
             timer:null,
-            isTiming:false,
             showDesc:false,
         }
     },
@@ -82,12 +81,10 @@ export default{
         'taskID',
         'taskTime',
         'adderIsVisible',
-        'taskMenuOpened'
+        'taskMenuOpened',
+        'isTiming'
     ],
     methods:{
-        updateIsPlaying(newValue){
-            this.isTiming = newValue;
-        },
         updateShowDesc(newValue){
             this.showDesc = newValue;
         },

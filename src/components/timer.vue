@@ -4,7 +4,7 @@
              {{ hour !== null ? hour : '00'  }} : {{ mins !== null ? mins : '00' }}
         </p>
 
-        <button v-if="!isPlaying" type="button" @click="play" class="p-3.5 w-fit h-fit bg-transparent border-0">
+        <button v-if="!isTiming" type="button" @click="play" class="p-3.5 w-fit h-fit bg-transparent border-0">
             <play class="w-[2.0rem] md:w-[2.4rem] h-auto" :stroke="'var(--boring-btn)'"/>
         </button>
         <button v-else @click="pause" type="button" class="p-3.5 w-fit h-fit bg-transparent border-0">
@@ -29,7 +29,6 @@
             return{
                 hour:null,
                 mins:null,
-                isPlaying:false,
                 timerFunc:null,
                 startTime:null,
                 curTime:null,
@@ -51,7 +50,13 @@
         },
         methods:{
 
-            play(){
+            async play(){
+
+                await this.$store.dispatch('updateIsTiming', 
+                {   
+                    taskID : this.taskID,
+                    isTiming : true
+                });
                 
                 // const startPoint = new Date().getTime() 
 
@@ -59,7 +64,7 @@
                   return (number < 10 ? '0' : '') + number;
                 }
 
-                this.timerFunc = setInterval(()=>{
+                this.timerFunc =  setInterval(()=>{
                     // const curTime = new Date().getTime();
                     // let elapsedTime = curTime - startPoint;
 
@@ -88,26 +93,33 @@
 
 
                 // this.startTime = startPoint;
-                this.isPlaying = true;
-
-                this.updatePlaying(true);
 
             },
-            pause(){
+            async pause(){
+                await this.$store.dispatch('updateIsTiming', 
+                {   
+                    taskID : this.taskID,
+                    isTiming : false
+                });
+
                 clearInterval(this.timerFunc);
-                this.updatePlaying(false);
-                this.isPlaying = false;
                 
             },
-            updatePlaying(state){
-                return this.$emit('updatePlaying',state)
-            }
         },
         watch:{
             isCompleted(newValue){
                 return this.pause();
+            },
+            isTiming(newValue){
+                return newValue ? this.pause() : this.play()
             }
+        },
+        async beforeDestroy(){
+            await this.$store.dispatch('updateIsTiming', 
+            {   
+                taskID : this.taskID,
+                isTiming : false
+            }); 
         }
-
     }
 </script>

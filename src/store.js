@@ -63,8 +63,42 @@ export default new Vuex.Store({
         }
     },
     actions:{
-        checkNetwork({commit}){
+        async checkNetwork({commit}){
             commit('setNetwork', navigator.onLine);
+
+            const userTasks = JSON.parse(localStorage.getItem('userTasks'));
+            const weeklyActivity = JSON.parse(localStorage.getItem('weeklyActivity'));
+            
+            if (this.state.online){
+                // Reference to the collection
+                const collectionRef = collection(db, 'Users');
+
+                // Get all documents in the collection
+                const querySnapshot = await getDocs(collectionRef);
+
+                const user = this.state.userId;
+                
+                // Iterate over each document in the query snapshot
+                querySnapshot.forEach((docu) => {
+
+                    // Get the document data
+                    const userID = docu.data().userID;
+                    const userData = docu.data()
+
+                    if (userID === user ){
+                        const docRef = doc(db, 'Users', docu.id);
+
+                        // Update database document
+                        updateDoc(docRef, { userTasks: userTasks });
+
+                        updateDoc(docRef, { weeklyActivity: weeklyActivity });
+
+                    }
+
+                });
+            }else{
+                //Do Nothing
+            }
         },
         async onAuthStateChanged({ commit }) {
 
@@ -327,7 +361,6 @@ export default new Vuex.Store({
                             // Modify the array (remove an element)
                             const userTasks = dataArray.map((item, index) => { 
                                 if(item.taskID === taskID){
-                                    item.isCompleted = false;
 
                                     return { ...item, isCompleted: true }
                                 }else{
@@ -352,9 +385,68 @@ export default new Vuex.Store({
                 if (dataArray){
                     const userTasks = dataArray.map((item, index) => { 
                         if(item.taskID === taskID){
-                            item.isCompleted = false;
 
                             return { ...item, isCompleted: true }
+                        }else{
+                            return item
+                        }
+                    });
+
+                    commit('setUserTasks', userTasks);
+                }
+            }
+        },
+        async updateIsTiming({commit}, {taskID, isTiming}){
+            if (this.state.online){
+            
+                try{
+                    // Reference to the collection
+                    const collectionRef = collection(db, 'Users');
+
+                    // Get all documents in the collection
+                    const querySnapshot = await getDocs(collectionRef);
+
+                    const user = this.state.userId;
+
+                    // Iterate over each document in the query snapshot
+                    querySnapshot.forEach((docu) => {
+                        // Get the document data
+                        const userID = docu.data().userID;
+                        const userData = docu.data()
+
+                        if (userID === user ){
+                            const docRef = doc(db, 'Users', docu.id);
+                        
+                            const dataArray = userData.userTasks;
+                            // Modify the array (remove an element)
+                            const userTasks = dataArray.map((item, index) => { 
+                                if(item.taskID === taskID){
+
+                                    return { ...item, isTiming: isTiming }
+                                }else{
+                                    return item
+                                }
+                            });
+
+                            // Update the document with the modified array
+                            updateDoc(docRef, { userTasks: userTasks });
+
+                            commit('setUserTasks', userTasks);
+                        }
+
+                    });
+                }catch(err){
+                    console.log(err)
+                }
+            }else{
+
+                let dataArray = JSON.parse(localStorage.getItem('userTasks'));
+
+                if (dataArray){
+                    const userTasks = dataArray.map((item, index) => { 
+                        if(item.taskID === taskID){
+
+                            return { ...item, isTiming: isTiming };
                         }else{
                             return item
                         }
@@ -397,6 +489,7 @@ export default new Vuex.Store({
                             taskTime : taskTime === null ? 0 : this.taskTime,
                             isActive : false,
                             isCompleted : false,
+                            isTiming : false,
                             dateCreated : new Date(`${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`)
                         }
 
@@ -414,6 +507,9 @@ export default new Vuex.Store({
                         console.log(err);
                     }
                 }else{
+
+                    commit('setTaskCreateWarning', false);
+
                     let local = JSON.parse(localStorage.getItem('userTasks'));
 
                     if (local){
@@ -668,6 +764,9 @@ export default new Vuex.Store({
             return getters.allTasks.filter(elem => {
                 return elem.isCompleted === false; 
             }) 
+        },
+        inCompletedLength : (state, getters) =>{
+            return getters.inCompletedTasks.length;
         },
         hoursWorked : (state) =>{
             return state.chartData.data.map(elem => elem / (1000 * 60 * 60));

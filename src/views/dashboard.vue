@@ -2,12 +2,12 @@
     <section class="hero-chart w-full h-[50%] mb-6">
         <lineChart class="max-h-full"/>
     </section>
-    <div class="flex flex-wrap w-full justify-center gap-[24px]">
-        <button @click="state = 'ongoing', taskState = false" :class="state ==='ongoing' ? 'text-[var(--primary-color)]' : null"  type="button">ongoing</button>
-        <button @click="state = 'completed', taskState = true" :class="state ==='completed' ? 'text-[var(--primary-color)]' : null" type="button">completed</button>
-    </div>
-    <section class="w-full overflow-scroll">
-        <div class="main-body overflow-scrol">
+    <section class="w-full h-[50%] overflow-scroll relative">
+        <div class="flex flex-wrap p-3.5 w-full bg-[var(--background-color)] justify-center gap-[24px] fixed z-30 left-1/2 -translate-x-1/2">
+            <button @click="state = 'ongoing', taskState = false" :class="state ==='ongoing' ? 'text-[var(--primary-color)]' : null"  type="button">ongoing</button>
+            <button @click="state = 'completed', taskState = true" :class="state ==='completed' ? 'text-[var(--primary-color)]' : null" type="button">completed</button>
+        </div>
+        <div class="main-body mt-[40px] overflow-scrol">
             
             <div class="tag w-fit capitalize p-3  rounded-md bg-[var(--secondary-color)]">
                 <small class=" inline-block">

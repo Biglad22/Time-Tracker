@@ -13,7 +13,7 @@
       <div class=" w-fit h-fit left-1/2 -translate-x-1/2 md:translate-x-0 md:h-full md:w-fit fixed top-[var(--nav-pos)] md:left-[var(--nav-pos)] z-50">
         <navbar :curPath="$route.path" />
       </div>
-      <div class="ml-0 md:ml-[200px] mt-[100px] md:mt-0 h-full  max-h-full overflow-y-hidden box-border relative">
+      <div class="ml-0 md:ml-[200px] mt-[62px] md:mt-0 h-full min-h-full  max-h-full overflow-y-hidden box-border relative">
         <RouterView ></RouterView>
       </div>
     </div>

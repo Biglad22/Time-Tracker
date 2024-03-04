@@ -132,7 +132,7 @@ a, button {
     font-size: 1.4rem !important;
     line-height: 2.0rem !important;
   }
-  p, a, span, li, button, input {
+  p, a, span, li, button, input, textarea {
     font-size: 1.4rem !important;
   }
   small{
@@ -168,7 +168,7 @@ a, button {
     font-size: 1.2rem !important;
     line-height: 1.8rem !important;
   }
-  p, a, span, li, button, input {
+  p, a, span, li, button, input, textarea {
     font-size: 1.6rem !important;
   }
   small{
@@ -200,7 +200,7 @@ a, button {
   h6 {
     font-size: 2.5rem !important;
   }
-  p, a, span, li, button, input {
+  p, a, span, li, button, input, textarea {
     font-size: 1.6rem !important;
   }
   small{
@@ -238,12 +238,18 @@ a, button {
   }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (min-width: 641px) {
+  :root{
+    --create-proj : 35rem;
+  }
+}
+
+@media screen and (max-width: 640px) {
   .body-container {
     padding: 4rem;
   }
   :root{
-    --create-proj : calc(100vw - 8rem);
+    --create-proj : calc(100vw - 10rem);
     --nav-pos:4rem;
   }
 }

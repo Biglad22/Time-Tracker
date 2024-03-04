@@ -1,5 +1,5 @@
 <template>
-    <div class="block max-h-[100%] overflow-scroll">
+    <div tabindex="0" @keyup="keyHandler" class="block h-[100%] overflow-scroll">
         <nav class="w-full flex flex-wrap mb-10 justify-between bg-[var(--background-color)] absolute top-0 left-0 z-40 py-3.5 pt-0 items-center">
             <div class="text-[var(--text-l)]">
                 <div class="today capitalize text-xs me-5 sm:me-10 hidden sm:inline-block">
@@ -13,12 +13,13 @@
             <createTask :isVisible="adderIsVisible" @updateAdderMenu="updateAdderMenu" />
         </nav>
         <main class=" flex-1 flex-shrink relative">
-            <div class=" text-center" v-if="tasks < 1">
+            <!-- FIXME  -->
+            <div class=" text-center" v-show="inCompletedLength < 1 ? true : false">
                 <h6 class=" capitalize text-[var(--text-l)]">
                     you have no task yet 
                 </h6>
             </div>
-            <div class="mt-12 " v-else v-for="(i , index) in tasks" >
+            <div class="mt-12 " v-show="inCompletedLength > 0 ? true : false" v-for="(i , index) in inCompletedTasks" >
                 <span class="this-week w-full px-1.5 py-3.5 bg-[var(--secondary-color)] block rounded-sm sticky top-[41px] z-20 backdrop-blur-md">
                     <p class="tag-name text-[var(--text-m)] capitalize font-medium">
                         shade get sweet 
@@ -32,7 +33,7 @@
                         </span>
                         <hr class=" flex-1 border-[var(--text-l)]"/>
                     </span>
-                    <task :tag="i.taskTag" :isCompleted="i.isCompleted" :tagColor="i.taskTagColor" :taskTime="i.taskTime" :taskID="i.taskID" :adderIsVisible="adderIsVisible" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" class="mb-3.5">
+                    <task v-if="!i.isCompleted" :isTiming="i.isTiming" :tag="i.taskTag" :isCompleted="i.isCompleted" :tagColor="i.taskTagColor" :taskTime="i.taskTime" :taskID="i.taskID" :adderIsVisible="adderIsVisible" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" class="mb-3.5">
                         <template v-slot:task-name>
                             {{ i.taskName }}
                         </template>
@@ -48,6 +49,7 @@
 <script>
         import Task from '@/components/Task.vue';
         import createTask from '@/components/createTask.vue';
+        import { mapGetters } from 'vuex';
     export default{
         components:{
             createTask,
@@ -60,14 +62,15 @@
                 toDay: new Date().getDate(),
                 toMonth: new Date().getMonth(),
                 toYear: new Date().getFullYear(),
-                hour: 0,
-                min:0,
-                sec:0,
+                hour: new Date().getHours(),
+                min: new Date().getMinutes(),
+                sec: new Date().getSeconds(),
                 adderIsVisible : false,
-                taskMenuOpened : false
+                taskMenuOpened : false,
             }
         },
         computed:{
+            ...mapGetters(['completedTasks', 'inCompletedTasks', 'inCompletedLength']),
             whatDay(){
 
                 return `${this.day[new Date().getDay()]} ${ this.toDay} ${this.month[this.toMonth]}, ${this.toYear}`
@@ -78,11 +81,16 @@
             userDataID(){
                 return this.$store.state.userDataId;
             },
-            tasks(){
-                return this.$store.state.userTasks;
-            }
         },
         methods:{
+            keyHandler(event){
+                event.preventDefault();
+
+                if (event.ctrlKey && event.key === 'n'){
+                    this.adderIsVisible = true;
+                }
+            },
+            
             pad(value){
                 return value < 10 ? `0${value}` : value; 
             },
@@ -127,10 +135,17 @@
         mounted(){
             this.$store.dispatch('checkNetwork');
             this.$store.dispatch('onAuthStateChanged');
+            console.log(typeof this.inCompletedLength);
         },
         updated(){
             this.$store.dispatch('checkNetwork');
-        }
+        },
+        // created(){
+        //     document.addEventListener('keydown', this.newTask(Event));
+        // },
+        // beforeDestroy(){
+        //     document.removeEventListener('keydown', this.newTask(Event));
+        // }
 
     }   
 </script>

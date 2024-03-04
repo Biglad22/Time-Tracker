@@ -8,7 +8,7 @@
         </button>
 
         <Transition name="menu">
-            <div class="w-[var(--create-proj)] sm:w-[45rem] absolute top-[120%] right-0 z-40 card bg-[var(--background-color)] p-10" v-show="isVisible">
+            <div class="w-[var(--create-proj)]  absolute top-[120%] right-0 z-40 card bg-[var(--background-color)] p-10" v-show="isVisible">
                 <div class="flex flex-wrap items-center justify-center gap-3.5">
                     <h6 class="capitalize p-3.5">new task</h6>
                     <button @click="closeBox" type="button" class="p-3.5">
@@ -23,15 +23,15 @@
                     </Transition>
                     
                     <inputField :entry="taskName" :placeholder="'task name'" :type="'text'" @inputEvent="taskNameUpdate"/>
-                    <textarea name="desc" cols="30"  v-model="taskDesc" class="w-full p-3.5 border-2 border-[var(--text-m)] focus:outline-none focus:border-[var(--primary-color)] bg-transparent caret-[var(--primary-color)] transition-all duration-500"></textarea>
+                    <textarea name="desc" cols="20"  v-model="taskDesc" class="w-full p-3.5 border-2 border-[var(--text-m)] focus:outline-none focus:border-[var(--primary-color)] bg-transparent caret-[var(--primary-color)] transition-all duration-500"></textarea>
 
-                    <div class="flex flex-wrap flex-row items-center justify-end gap-5 sm:gap-10">
-                        <div class="flex flex-wrap flex-row  max-h-max h-max items-stretch gap-1.5">
-                            <input type="color" name="tag-color" v-model="taskTagColor" class="w-[3.2rem] h-auto border-1 border-[var(--text-m)] "/>
-                            <inputField :entry="taskTag" :required="true" :placeholder="'tag'" :type="'text'" @inputEvent="taskTagUpdate" class="w-[10rem]"/>
+                    <div class="flex flex-wrap flex-row items-center justify-between gap-5 sm:gap-10">
+                        <div class="flex flex-wrap flex-row w-full min-[350px]:w-fit  max-h-max h-max items-stretch gap-1.5">
+                            <input type="color" name="tag-color" v-model="taskTagColor" class="w-[3.2rem] h-auto p-1.5 bg-transparent border-2 border-[var(--text-m)] "/>
+                            <inputField :entry="taskTag" :required="true" :placeholder="'tag'" :type="'text'" @inputEvent="taskTagUpdate" class="w-[10rem] flex-1 sm:flex-auto"/>
                         </div>
-                        <timer :start="taskTime" @timeUpdate="taskTime = newVue" />
-                        <button type="button" @click="createTask" class="px-3.5 py-1.5 w-fit text-[var(--text-h)] bg-[var(--primary-color)] border-2 border-[var(--primary-color)] hover:bg-[var(--main-hover)] transition-all duration-500 rounded-[5rem]">
+                        <!-- <timer :start="taskTime" @timeUpdate="taskTime = newVue"  /> -->
+                        <button type="button" @click="createTask" class="px-4 py-2 w-fit text-[var(--text-h)] bg-[var(--primary-color)] border-2 border-[var(--primary-color)] hover:bg-[var(--main-hover)] transition-all duration-500 rounded-[5rem]">
                             create
                         </button>
                     </div>
@@ -47,6 +47,7 @@
     import inputField from './input.vue' 
     import timer from './timer.vue';
     import New from '../assets/icons/new.vue';
+    
 
     export default{
         components:{
@@ -80,7 +81,7 @@
                 this.taskName = null;
                 this.taskDesc = null;
                 this.taskTag = null;
-                this.taskTagColor = null;
+                this.taskTagColor = '#6A6C6D';
                 this.taskTime = null;
             },
             async createTask(){
@@ -90,7 +91,7 @@
                     taskDesc : this.taskDesc, 
                     taskTag : this.taskTag, 
                     taskTagColor : this.taskTagColor, 
-                    taskTime : this.taskTime
+                    taskTime : this.taskTime,
                 });
 
                 if (! this.warn){
@@ -111,7 +112,8 @@
             warn(){
                 return this.$store.state.taskCreateWarning;
             }
-        }
+        },
+       
 
     }
 </script>
