@@ -15,15 +15,14 @@
 <script>
     import play from '../assets/icons/play.vue';
     import pause from '../assets/icons/pause.vue';
-    import {getAuth, signInWithEmailAndPassword} from 'firebase/auth';
 
     export default {
         components:{play, pause},
         props:[
             'start',
-            'isTiming',
             'taskID',
-            'isCompleted'
+            'isCompleted',
+            'isTiming'
         ],
         data(){
             return{
@@ -35,6 +34,7 @@
                 index: this.taskIndex
             }
         },
+
         created(){
             this.startTime = this.start === null ? 0 : this.start;
 
@@ -52,11 +52,7 @@
 
             async play(){
 
-                await this.$store.dispatch('updateIsTiming', 
-                {   
-                    taskID : this.taskID,
-                    isTiming : true
-                });
+                this.$store.dispatch('updateTimer', { taskID : this.taskID, bol : true});
                 
                 // const startPoint = new Date().getTime() 
 
@@ -96,11 +92,7 @@
 
             },
             async pause(){
-                await this.$store.dispatch('updateIsTiming', 
-                {   
-                    taskID : this.taskID,
-                    isTiming : false
-                });
+                this.$store.dispatch('updateTimer', { taskID : this.taskID, bol : false});
 
                 clearInterval(this.timerFunc);
                 

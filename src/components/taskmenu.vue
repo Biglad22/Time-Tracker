@@ -13,19 +13,19 @@
 
         <Transition name="menu">
             <div v-show="isVisible" class="flex flex-wrap w-max flex-col py-7 gap-1.5 justify-start items-start rounded-sm absolute -top-[calc(100% + 0.8rem)] right-2 card  bg-[var(--background-color)] z-30">
-                <button type="button" @click="updateCompleted" class="px-7 py-1.5 w-full hover:bg-[rgb(26,26,26)] text-left flex flex-wrap items-center gap-10 justify-between" v-if="!isCompleted" >
+                <button type="button" @click="updateCompleted" class="px-7 py-1.5 w-full hover:bg-[rgba(26,26,26,0.5)] text-left transition-all ease-in-out duration-500 flex flex-wrap items-center gap-10 justify-between" v-if="!isCompleted" >
                     <span class="uppercase text-[var(--success-color)]">
                         Completed
                     </span>
                     <check :stroke="'var(--success-color)'"/>
                 </button>
-                <button type="button" @click="updateShowDesc" class="px-7 py-1.5 w-full hover:bg-[rgb(26,26,26)] text- flex flex-wrap items-center gap-10 justify-between" >
+                <button type="button" @click="updateShowDesc" class="px-7 py-1.5 w-full hover:bg-[rgba(26,26,26,0.5)] text-left transition-all ease-in-out duration-500 flex flex-wrap items-center gap-10 justify-between" >
                     <span class="uppercase text-[var(--boring-btn)]">
                         details
                     </span>
                     <info :stroke="'var(--boring-btn)'" />
                 </button>
-                <button type="button" @click="deleteTask" class="px-7 py-1.5 w-full hover:bg-[rgb(26,26,26)] text- flex flex-wrap items-center gap-10 justify-between" v-if="!isCompleted" >
+                <button type="button" @click="deleteTask" class="px-7 py-1.5 w-full hover:bg-[rgb(26,26,26,0.5)] text- flex flex-wrap items-center gap-10 justify-between transition-all ease-in-out duration-500" v-if="!isCompleted" >
                     <span class="uppercase text-[var(--danger-color)]">
                         delete
                     </span>

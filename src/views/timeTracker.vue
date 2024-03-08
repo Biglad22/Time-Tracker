@@ -1,39 +1,39 @@
 <template>
-    <div tabindex="0" @keyup="keyHandler" class="block h-[100%] overflow-scroll">
+    <div class="block h-[100%] min-h-[50vh] overflow-scroll">
         <nav class="w-full flex flex-wrap mb-10 justify-between bg-[var(--background-color)] absolute top-0 left-0 z-40 py-3.5 pt-0 items-center">
-            <div class="text-[var(--text-l)]">
-                <div class="today capitalize text-xs me-5 sm:me-10 hidden sm:inline-block">
+            <div class="text-[var(--text-m)]">
+                <small class="today capitalize me-5 sm:me-10 hidden sm:inline-block">
                     {{ clock }}
-                </div>
+                </small>
 
-                <div class="today capitalize text-xs inline-block">
+                <small class="today capitalize inline-block">
                     {{ whatDay }}
-                </div>
+                </small>
             </div>
             <createTask :isVisible="adderIsVisible" @updateAdderMenu="updateAdderMenu" />
         </nav>
-        <main class=" flex-1 flex-shrink relative">
+        <main class=" flex-1 flex-shrink min-h-[50vh] relative">
             <!-- FIXME  -->
-            <div class=" text-center" v-show="inCompletedLength < 1 ? true : false">
+            <div class=" text-center mt-[10%] " v-if="inCompletedLength < 1">
                 <h6 class=" capitalize text-[var(--text-l)]">
                     you have no task yet 
                 </h6>
             </div>
-            <div class="mt-12 " v-show="inCompletedLength > 0 ? true : false" v-for="(i , index) in inCompletedTasks" >
+            <div class=" mt-20 " v-else v-for="(n , weekDate) in sortedTasks"  :key="weekDate">
                 <span class="this-week w-full px-1.5 py-3.5 bg-[var(--secondary-color)] block rounded-sm sticky top-[41px] z-20 backdrop-blur-md">
                     <p class="tag-name text-[var(--text-m)] capitalize font-medium">
-                        shade get sweet 
+                        {{ weekDate }}
                     </p>
                 </span>
-                <div>
+                <div  v-for="(taskArr, dayDate) in n" :key="dayDate">
                     
                     <span class="flex flex-wrap gap-1.5 py-7 pb-2.5 items-center text-[var(--text-l)]">
                         <span class="block uppercase tag-name">
-                            {{ 'gow' }}
+                            {{ dayDate }}
                         </span>
                         <hr class=" flex-1 border-[var(--text-l)]"/>
                     </span>
-                    <task v-if="!i.isCompleted" :isTiming="i.isTiming" :tag="i.taskTag" :isCompleted="i.isCompleted" :tagColor="i.taskTagColor" :taskTime="i.taskTime" :taskID="i.taskID" :adderIsVisible="adderIsVisible" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" class="mb-3.5">
+                    <task  v-for="i in taskArr"  :tag="i.taskTag" :isCompleted="i.isCompleted" :tagColor="i.taskTagColor" :taskTime="i.taskTime" :taskID="i.taskID" :adderIsVisible="adderIsVisible" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" class="mb-3.5">
                         <template v-slot:task-name>
                             {{ i.taskName }}
                         </template>
@@ -67,6 +67,7 @@
                 sec: new Date().getSeconds(),
                 adderIsVisible : false,
                 taskMenuOpened : false,
+                
             }
         },
         computed:{
@@ -81,15 +82,38 @@
             userDataID(){
                 return this.$store.state.userDataId;
             },
+            sortedTasks() {
+
+              const tasksByWeek = {};
+              this.inCompletedTasks.forEach(task => {
+                const weekStartDate = new Date(task.dateCreated);
+
+                weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay()); // Start of week
+
+                const weekEndDate = new Date(weekStartDate);
+
+                weekEndDate.setDate(weekEndDate.getDate() + 6); // End of week
+
+                const weekRange = `${this.month[weekEndDate.getMonth()]} ${weekStartDate.toISOString().slice(8, 10)} - ${weekEndDate.toISOString().slice(8, 10)} ${weekEndDate.getFullYear()}`;
+                
+                if (!tasksByWeek[weekRange]) {
+                  tasksByWeek[weekRange] = {};
+                }
+            
+                const taskDate = new Date(task.dateCreated);
+                const dayDate = taskDate.toISOString().slice(0, 10); // Extract YYYY-MM-DD
+                if (!tasksByWeek[weekRange][dayDate]) {
+                  tasksByWeek[weekRange][dayDate] = [];
+                }
+            
+                tasksByWeek[weekRange][dayDate].push(task);
+              });
+              return tasksByWeek;
+            },
+            
         },
         methods:{
-            keyHandler(event){
-                event.preventDefault();
-
-                if (event.ctrlKey && event.key === 'n'){
-                    this.adderIsVisible = true;
-                }
-            },
+            
             
             pad(value){
                 return value < 10 ? `0${value}` : value; 
@@ -110,36 +134,12 @@
             },
             updateTaskMenuOpened(newValue){
                 return this.taskMenuOpened = newValue;
-            }
-            // daySep(arr){
-            //     let collection = [];
-
-            //     for(let i = 0; i < 7; i++){
-            //         demo = arr.filter(elem =>{
-            //             let day =  elem.dateCreated.split(' ');
-            //             day = day[0];
-            //             return day === i;
-            //         })
-
-            //         return collection.push(demo);
-            //     }
-                
-            //     console.log(collection);
-
-            //     return collection;
-            // }
+            },
         },
         beforeMount(){
             return this.timeCounter();
         },
-        mounted(){
-            this.$store.dispatch('checkNetwork');
-            this.$store.dispatch('onAuthStateChanged');
-            console.log(typeof this.inCompletedLength);
-        },
-        updated(){
-            this.$store.dispatch('checkNetwork');
-        },
+        
         // created(){
         //     document.addEventListener('keydown', this.newTask(Event));
         // },

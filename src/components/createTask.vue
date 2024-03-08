@@ -1,14 +1,14 @@
 <template>
     <div class="w-fit h-fit relative">
-        <button @click="$emit('updateAdderMenu', !isVisible)" class="flex flex-wrap items-center group gap-1.5 w-fit text-[var(--primary-color)] group-hover:text-[var(--main-hover)]">
-            <span class="hidden sm:block">create project</span>
-            <span class="p-1.5 flex-auto rounded-full bg-[var(--primary-color)] group-hover:bg-[var(--main-hover)] transition-all ease-in-out duration-500">
+        <button  @click="$emit('updateAdderMenu', !isVisible)" class="flex flex-wrap items-center group gap-1.5 w-fit text-[var(--primary-color)] group-hover:text-[var(--main-hover)]">
+            <span class="hidden sm:block ">create project</span>
+            <span class="p-1.5 flex-auto rounded-full bg-[var(--primary-color)] group-hover:bg-[var(--boring-light)] transition-all ease-in-out duration-500">
                 <cross class="w-[2.0rem] flex-auto sm:w-[2.4rem] h-auto"/>
             </span>
         </button>
 
         <Transition name="menu">
-            <div class="w-[var(--create-proj)]  absolute top-[120%] right-0 z-40 card bg-[var(--background-color)] p-10" v-show="isVisible">
+            <div class="w-[var(--create-proj)]  absolute top-[120%] right-[8px] z-40 card bg-[var(--background-color)] p-10" v-show="isVisible">
                 <div class="flex flex-wrap items-center justify-center gap-3.5">
                     <h6 class="capitalize p-3.5">new task</h6>
                     <button @click="closeBox" type="button" class="p-3.5">
@@ -31,7 +31,7 @@
                             <inputField :entry="taskTag" :required="true" :placeholder="'tag'" :type="'text'" @inputEvent="taskTagUpdate" class="w-[10rem] flex-1 sm:flex-auto"/>
                         </div>
                         <!-- <timer :start="taskTime" @timeUpdate="taskTime = newVue"  /> -->
-                        <button type="button" @click="createTask" class="px-4 py-2 w-fit text-[var(--text-h)] bg-[var(--primary-color)] border-2 border-[var(--primary-color)] hover:bg-[var(--main-hover)] transition-all duration-500 rounded-[5rem]">
+                        <button type="button" @click="createTask" class="px-4 py-2 w-fit text-[var(--text-dark-h)] hover:text-[var(--text-h)] bg-[var(--primary-color)] border-2 border-[var(--primary-color)] hover:bg-[var(--main-hover)] transition-all duration-500 rounded-[5rem]">
                             create
                         </button>
                     </div>
@@ -83,6 +83,7 @@
                 this.taskTag = null;
                 this.taskTagColor = '#6A6C6D';
                 this.taskTime = null;
+                this.$store.commit('setTaskCreateWarning', false);
             },
             async createTask(){
 
@@ -94,15 +95,8 @@
                     taskTime : this.taskTime,
                 });
 
-                if (! this.warn){
-
-                    this.$emit('updateAdderMenu', !this.isVisible);
-
-                    this.taskName = null;
-                    this.taskDesc = null;
-                    this.taskTag = null;
-                    this.taskTagColor = null;
-                    this.taskTime = null;
+                if (!this.warn){
+                    this.closeBox();
                 }else{
                     //do nothing
                 }

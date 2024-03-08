@@ -59,12 +59,6 @@
         },  
         computed:{
             ...mapGetters(['completedTasks', 'inCompletedTasks'])
-        },
-        mounted(){
-            this.$store.dispatch('onAuthStateChanged');  
-        },
-        updated(){
-            this.$store.dispatch('checkNetwork');
         }
         
     }

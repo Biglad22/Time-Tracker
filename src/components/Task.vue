@@ -1,16 +1,16 @@
 <template>
     <div>
         <div class="flex flex-row flex-wrap gap-10 justify-between  items-center">
-            <h6 class=" capitalize font-normal transition-all duration-500" :class="isTiming ? 'text-[var(--text-h)]' : 'text-[var(--text-m)]' ">
-             <slot name="task-name"></slot>
-            </h6>
+            <p class=" capitalize font-normal transition-all duration-500" :class=" isTiming ? 'text-[var(--text-h)]' : 'text-[var(--text-m)]' ">
+                <slot name="task-name"></slot>
+            </p>
             <div class="flex flex-row flex-wrap gap-3.5 items-center"> 
                 <tasktag v-if="!isCompleted" :tagColor="tagColor" class=" hidden sm:flex">
                     <template v-slot:tag>
                         {{ tag }}
                     </template>
                 </tasktag>
-                <timer  v-if="!isCompleted" :taskID="taskID"  :start="taskTime" :isTiming="isTiming" class=" hidden sm:flex"/>
+                <timer  v-if="!isCompleted" :taskID="taskID" :isTiming="isTiming" :start="taskTime"  class=" hidden sm:flex"/>
                 <p class="capitalize text-[var(--success-color)]" v-else>
                     Completed
                 </p>
@@ -28,14 +28,21 @@
                         <tasktag :tagColor="tagColor" class=" flex sm:hidden">
                             <template v-slot:tag>
                                 {{ tag }}
+
+                                
                             </template>
                         </tasktag>
                     </div>
-                    <p class=" text-[var(--text-m)]">
+                    <p class=" text-[var(--text-h)]">
                         Description: 
-                        <slot name="task-desc"></slot>
+                        <span class="text-[var(--text-m)]">    <slot name="task-desc"></slot> </span>
                     </p>
-                    <timer :start="taskTime" v-if="!isCompleted" :isTiming="isTiming" :isCompleted="isCompleted" :taskID="taskID"  class=" flex sm:hidden" />
+                    <div class="flex flex-wrap w-full gap-3 justify-between items-baseline">
+                        <small class="text-[var(--text-m)]">
+                            {{ taskTime }} worked 
+                        </small>
+                        <timer :start="taskTime" v-if="!isCompleted" :isTiming="isTiming" :isCompleted="isCompleted" :taskID="taskID"  class=" flex sm:hidden" />
+                    </div>
                 </div>
             </div>
         </Transition>
@@ -52,6 +59,7 @@
     import tasktag from './tasktag.vue'
     import moreMenu from './taskmenu.vue';
     import { Transition } from 'vue';
+    import { mapGetters } from 'vuex';
 
 export default{
     components:{
@@ -74,6 +82,12 @@ export default{
             showDesc:false,
         }
     },
+    computed:{
+        ...mapGetters(['timerState']),
+        isTiming(){
+            return this.timerState(this.taskID);
+        }
+    },
     props:[
         'tag',
         'tagColor',
@@ -82,7 +96,6 @@ export default{
         'taskTime',
         'adderIsVisible',
         'taskMenuOpened',
-        'isTiming'
     ],
     methods:{
         updateShowDesc(newValue){
@@ -90,8 +103,9 @@ export default{
         },
         updateTaskMenuOpened(newValue){
             return this.$emit('updateTaskMenuOpened', newValue);
-        }
-    }
+        },
+    },
+    
  }
 </script>
 <style>
