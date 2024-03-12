@@ -15,6 +15,7 @@
 <script>
     import play from '../assets/icons/play.vue';
     import pause from '../assets/icons/pause.vue';
+    import { mapActions, mapGetters } from 'vuex';
 
     export default {
         components:{play, pause},
@@ -22,96 +23,56 @@
             'start',
             'taskID',
             'isCompleted',
-            'isTiming'
         ],
         data(){
             return{
-                hour:null,
-                mins:null,
                 timerFunc:null,
                 startTime:null,
                 curTime:null,
-                index: this.taskIndex
+                
             }
         },
-
-        created(){
-            this.startTime = this.start === null ? 0 : this.start;
-
-            const hours = Math.floor(this.startTime / (1000 * 60 * 60));
-            const minutes = Math.floor((this.startTime % (1000 * 60 * 60)) / (1000 * 60));
-
-            const padZero = number => {
-              return (number < 10 ? '0' : '') + number;
+        computed:{
+            ...mapGetters(['timerState', 'taskTime']),
+            hour(){
+                const hours = Math.floor(this.taskTime(this.taskID) / (1000 * 60 * 60));
+                return this.padZero(hours);
+            },
+            mins(){
+                const minutes = Math.floor((this.taskTime(this.taskID) % (1000 * 60 * 60)) / (1000 * 60));
+                return this.padZero(minutes);
+            },
+            isTiming(){
+                return this.timerState(this.taskID);
             }
-
-            this.hour = padZero(hours);
-            this.mins = padZero(minutes);
         },
         methods:{
+            ...mapActions(['startTimer', 'pauseTime']),
+
+            padZero(number){
+              return (number < 10 ? '0' : '') + number;
+            },
 
             async play(){
 
-                this.$store.dispatch('updateTimer', { taskID : this.taskID, bol : true});
-                
-                // const startPoint = new Date().getTime() 
-
-                const padZero = number => {
-                  return (number < 10 ? '0' : '') + number;
+                if ( !this.$store.state.playingTimer[this.taskID].isTiming){
+                    this.startTimer({taskID : this.taskID, start : this.start});
+                }else{
+                    //do nothing
                 }
 
-                this.timerFunc =  setInterval(()=>{
-                    // const curTime = new Date().getTime();
-                    // let elapsedTime = curTime - startPoint;
-
-                    let actualElapsedTime = 5000 + (this.start === null ? 0 : this.start);
-
-                    let elapsedTime = actualElapsedTime - this.start;
-                    this.$store.dispatch('graphDate',{
-                        time: 5000
-                    });
-
-                    this.$store.dispatch('updateTime', {
-                        elapsedTime : actualElapsedTime, 
-                        taskID : this.taskID
-                    });
-
-                    
-
-                    const hours = Math.floor(actualElapsedTime / (1000 * 60 * 60));
-                    const minutes = Math.floor((actualElapsedTime % (1000 * 60 * 60)) / (1000 * 60));
-
-                    this.hour = padZero(hours);
-                    this.mins = padZero(minutes);
-
-                    
-                }, 5000);
-
-
-                // this.startTime = startPoint;
-
             },
-            async pause(){
-                this.$store.dispatch('updateTimer', { taskID : this.taskID, bol : false});
-
-                clearInterval(this.timerFunc);
-                
+            pause(){
+                this.pauseTime(this.taskID);
             },
-        },
-        watch:{
-            isCompleted(newValue){
-                return this.pause();
-            },
-            isTiming(newValue){
-                return newValue ? this.pause() : this.play()
-            }
-        },
-        async beforeDestroy(){
-            await this.$store.dispatch('updateIsTiming', 
-            {   
-                taskID : this.taskID,
-                isTiming : false
-            }); 
         }
+        // watch:{
+        //     isCompleted(newValue){
+        //         return this.pause();
+        //     },
+        //     isTiming(newValue){
+        //         return newValue ? this.pause() : this.play()
+        //     }
+        // }
     }
 </script>

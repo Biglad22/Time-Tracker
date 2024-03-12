@@ -10,11 +10,11 @@
                         {{ tag }}
                     </template>
                 </tasktag>
-                <timer  v-if="!isCompleted" :taskID="taskID" :isTiming="isTiming" :start="taskTime"  class=" hidden sm:flex"/>
+                <timer  v-if="!isCompleted" :taskID="taskID" :start="taskTime"  class=" hidden sm:flex"/>
                 <p class="capitalize text-[var(--success-color)]" v-else>
                     Completed
                 </p>
-                <moreMenu :taskID="taskID" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" :showDesc="showDesc" :isCompleted="isCompleted" @updateShowDesc="updateShowDesc" :adderIsVisible="adderIsVisible"/>
+                <moreMenu :taskID="taskID" :taskMenuOpened="taskMenuOpened" @updateMenuVisibility="updateMenuVisibility" @updateTaskMenuOpened="updateTaskMenuOpened" :showDesc="showDesc" :isCompleted="isCompleted" @updateShowDesc="updateShowDesc" :isVisible="isVisible" :adderIsVisible="adderIsVisible"/>
             </div>
         </div>
         <Transition name="menu">
@@ -39,9 +39,9 @@
                     </p>
                     <div class="flex flex-wrap w-full gap-3 justify-between items-baseline">
                         <small class="text-[var(--text-m)]">
-                            {{ taskTime }} worked 
+                            {{ Math.floor( taskTime / 3600000 )}} worked 
                         </small>
-                        <timer :start="taskTime" v-if="!isCompleted" :isTiming="isTiming" :isCompleted="isCompleted" :taskID="taskID"  class=" flex sm:hidden" />
+                        <timer :start="taskTime" v-if="!isCompleted" :isCompleted="isCompleted" :taskID="taskID"  class=" flex sm:hidden" />
                     </div>
                 </div>
             </div>
@@ -96,6 +96,7 @@ export default{
         'taskTime',
         'adderIsVisible',
         'taskMenuOpened',
+        'isVisible'
     ],
     methods:{
         updateShowDesc(newValue){
@@ -104,8 +105,10 @@ export default{
         updateTaskMenuOpened(newValue){
             return this.$emit('updateTaskMenuOpened', newValue);
         },
-    },
-    
+        updateMenuVisibility(newValue){
+            this.$emit('updateMenuVisibility', {value : newValue, id : this.taskID})
+        }
+    }
  }
 </script>
 <style>

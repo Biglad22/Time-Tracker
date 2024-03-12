@@ -67,14 +67,22 @@ export default new Vuex.Store({
             state.chartData.labels = label !== null ? label : [0];
             localStorage.setItem('chartData_labels', JSON.stringify(label));
         },
-        setPlayingTimer(state, {taskID, bol}){
-            state.playingTimer[taskID] = bol;
+
+        //timer settings
+        setPlayingTimer(state, payload){
+
+            if (!state.playingTimer[payload.taskID]){
+                state.playingTimer = { ...state.playingTimer, [payload.taskID] : { isTiming : payload.bol, taskInterval : payload.taskInterval}};
+                localStorage.setItem('playingTimer', JSON.stringify(state.playingTimer));
+            }else{
+                //do nothing
+            }
         },
         setReady(state, bol){
             state.ready = bol
         },
 
-        //offlinechanges
+        //offline changes
         setPendingTaskChanges(state, task){
             state.pendingTaskChanges = task;
             localStorage.setItem('pendingTaskChanges', JSON.stringify(task));
@@ -93,77 +101,108 @@ export default new Vuex.Store({
         },
         setSaveComplete(state, bol){
             state.saveComplete = bol;
+        },
+
+        //timer playing state 
+        setPlaying(state, payload){
+
+            state.playingTimer[payload.taskID].taskInterval = payload.taskInterval;
+            state.playingTimer[payload.taskID].isTiming = payload.bol;
+
+
+            localStorage.setItem('playingTimer', JSON.stringify(state.playingTimer));
+        }, 
+        setPause(state, payload){
+
+            state.playingTimer[payload.taskID].taskInterval = payload.taskInterval;
+            state.playingTimer[payload.taskID].isTiming = payload.bol;
+
+
+            localStorage.setItem('playingTimer', JSON.stringify(state.playingTimer));
         }
+
     },
     actions:{
         async updateServer({commit}, {pass}){
-            console.log(pass)
-            if (pass){ 
-                
-                const pendingTaskChanges = JSON.parse(localStorage.getItem('pendingTaskChanges'));
-                const pendingWeeklyActivity = JSON.parse(localStorage.getItem('pendingWeeklyActivity'));
+            
+            if(pass){ 
 
-                console.log(pendingTaskChanges);
-                console.log(pendingWeeklyActivity);
+                try{
 
-                commit('setSaveComplete', false);
-                
+                    firebaseOnAuthStateChanged(getAuth(), user => {
+                      if (user) {
+                        commit('setUserID', user.uid);
+                      } else {
+                        commit('setUserID', null);
+                        commit('setReady', true);
+                      }
+                    })
 
-                const taskRef = doc(db, "Users", this.state.userDataId);
 
-                switch (true) {
+                    const pendingTaskChanges = JSON.parse(localStorage.getItem('pendingTaskChanges'));
+                    const pendingWeeklyActivity = JSON.parse(localStorage.getItem('pendingWeeklyActivity'));
 
-                    case pendingWeeklyActivity !== null && pendingTaskChanges !== null:
+                    commit('setSaveComplete', false);
 
+
+                    const taskRef = doc(db, "Users", this.state.userDataId);
+
+                    switch (true) {
+
+                        case pendingWeeklyActivity !== null && pendingTaskChanges !== null:
+
+
+                            await updateDoc(taskRef, {
+                                userTasks: pendingTaskChanges
+                            });
+
+                            await updateDoc(taskRef, {
+                                weeklyActivity: pendingWeeklyActivity
+                            });
                         
 
-                        await updateDoc(taskRef, {
-                            userTasks: pendingTaskChanges
-                        });
+                            await this.dispatch('getUserData');
+                            commit('setClearPendingWeeklyActivity');
+                            commit('setClearPendingTaskChanges');
 
-                        await updateDoc(taskRef, {
-                            weeklyActivity: pendingWeeklyActivity
-                        });
-
-                        await this.dispatch('getUserData');
-                        await commit('setClearPendingWeeklyActivity');
-                        await commit('setClearPendingTaskChanges');
-                            
-                        break;
-                    
-                    case pendingWeeklyActivity !== null && pendingTaskChanges === null:
-                        pendingWeeklyActivity = JSON.parse(localStorage.getItem('pendingWeeklyActivity'));
-
-                        await updateDoc(taskRef, {
-                            weeklyActivity: pendingWeeklyActivity
-                        });
-
-                        await this.dispatch('getUserData');
-                        await commit('setClearPendingWeeklyActivity');
-
-                        break;
-
+                            break;
                         
-                    case pendingWeeklyActivity === null && pendingTaskChanges !== null:
+                        case pendingWeeklyActivity !== null && pendingTaskChanges === null:
+                            pendingWeeklyActivity = JSON.parse(localStorage.getItem('pendingWeeklyActivity'));
 
-                        pendingTaskChanges = JSON.parse(localStorage.getItem('pendingTaskChanges'));
+                            await updateDoc(taskRef, {
+                                weeklyActivity: pendingWeeklyActivity
+                            });
 
-                        await updateDoc(taskRef, {
-                            userTasks: pendingTaskChanges
-                        });
+                            await this.dispatch('getUserData');
+                            commit('setClearPendingWeeklyActivity');
 
-                        await this.dispatch('getUserData');
-                        await commit('setClearPendingTaskChanges');
-
-                        break;
-
-                    case pendingWeeklyActivity === null && pendingTaskChanges !== null:
+                            break;
 
 
-                    default:
-                        await commit('setSaveComplete', true);
-                        
-                        break;
+                        case pendingWeeklyActivity === null && pendingTaskChanges !== null:
+
+                            pendingTaskChanges = JSON.parse(localStorage.getItem('pendingTaskChanges'));
+
+                            await updateDoc(taskRef, {
+                                userTasks: pendingTaskChanges
+                            });
+
+                            await this.dispatch('getUserData');
+                            commit('setClearPendingTaskChanges');
+
+                            break;
+
+                        case pendingWeeklyActivity === null && pendingTaskChanges !== null:
+
+
+                        default:
+                            commit('setSaveComplete', true);
+                            break;
+                    }
+                }
+                catch(err){
+                    console.log(err);
                 }
 
 
@@ -171,12 +210,9 @@ export default new Vuex.Store({
                 
 
             }else{
-                console.log('not working');
+                
                 const pendingTaskChanges = localStorage.getItem('pendingTaskChanges');
                 const pendingWeeklyActivity = localStorage.getItem('pendingWeeklyActivity');
-
-                console.log(pendingTaskChanges);
-                console.log(pendingWeeklyActivity);
                 //do nothing
             }
         },
@@ -245,7 +281,9 @@ export default new Vuex.Store({
                     commit('setUserID', local);
                     this.dispatch('getUserData');
                     this.dispatch('chartData');
+
                     commit('setReady', true);
+                    commit('setSaveComplete', false);
                 }else{
                     commit('setUserID', null);
                     commit('setReady', true);
@@ -264,6 +302,7 @@ export default new Vuex.Store({
 
             }catch(error){
                 let err;
+
                 switch (error.code) {
                     case 'auth/invalid-email':
                         err = 'Invalid email address.';
@@ -274,8 +313,8 @@ export default new Vuex.Store({
                     case 'auth/user-not-found':
                         err = 'User not found.';
                         break;
-                    case 'auth/wrong-password':
-                        err = 'Incorrect password.';
+                    case 'auth/invalid-login-credentials':
+                        err = 'Incorrect email / password.';
                         break;
                     case 'auth/invalid-credential':
                         err = 'This user does not exist.';
@@ -383,7 +422,7 @@ export default new Vuex.Store({
         },
         async getUserData({commit}){
 
-            if (this.state.online){
+            if (navigator.onLine){
                 const user = this.state.userId;
                 
                 try{
@@ -402,19 +441,23 @@ export default new Vuex.Store({
                                 commit('setUserTasks', userTasks);
                                 commit('setWeeklyActivity', weeklyActivity);
                                 commit('setUserData', userData);
+                                
 
-                                userTasks.forEach( task => {
-                                    return commit('setPlayingTimer', {taskID : task.taskID, bol : false})
-                                });
+                                if(userTasks.length > 0){
+                                    userTasks.forEach( task => {
+                                        return commit('setPlayingTimer', {taskID : task.taskID, taskInterval : null, bol : false})
+                                    });
+                                }else{
+                                    //do nothing
+                                }
 
                                 commit('setReady', true);
                                 commit('setSaveComplete', true);
-                                console.log(this.state.saveComplete);
+                                
 
                             })();
 
                             const userDataID = data.id;
-
                             commit('setUserDataID', userDataID);
 
                         }else{
@@ -423,7 +466,7 @@ export default new Vuex.Store({
                     })
                 }
                 catch(err){
-                    console.error(err);
+                    console.log(err);
                 }
             }else{
                 let userDataID = localStorage.getItem('userDataId');
@@ -432,8 +475,6 @@ export default new Vuex.Store({
                 let weeklyActivity = JSON.parse(localStorage.getItem('weeklyActivity'));
 
                 if (userDataID && userData && userTasks){
-
-                    
 
                     userTasks.forEach(task => {
                         return commit('setPlayingTimer',{taskID : task.taskID, bol : false})
@@ -477,7 +518,7 @@ export default new Vuex.Store({
                         // Update the document with the modified array
                         updateDoc(docRef, { userTasks: userTasks });
 
-                        commit('setUserTasks', userTasks);
+                        this.dispatch('getUserData');
                     }
 
                 });
@@ -485,7 +526,7 @@ export default new Vuex.Store({
                 let userTasks = JSON.parse(localStorage.getItem('userTasks'));
                 const newUserTasks = userTasks.filter((item, index) => item.taskID !== taskID);
 
-                commit('setUserTasks', newUserTasks);
+                this.dispatch('getUserData');
                 commit('setPendingTaskChanges', newUserTasks);
             }
         },
@@ -593,9 +634,7 @@ export default new Vuex.Store({
                             userTasks: arrayUnion(newTask)
                         });
 
-                        const userTasks = await taskRef.userTasks;
-
-                        this.dispatch('getUserData');
+                       this.dispatch('getUserData')
                         
 
                     }catch(err){
@@ -634,10 +673,10 @@ export default new Vuex.Store({
                             dateCreated : `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`
                         }
                         local.push(newTask);
+
+                        commit('setPlayingTimer',{taskID : newTask.taskID, bol : false})
                         commit('setUserTasks', local);
                         commit('setPendingTaskChanges', local);
-
-                        this.dispatch('getUserData');
 
                     }
                 }
@@ -651,13 +690,9 @@ export default new Vuex.Store({
             if (this.state.online){
 
                 try{
-                    // Reference to the collection
-                    const collectionRef =  collection(db, 'Users');
 
                     // Get all documents in the collection
-                    const querySnapshot = await getDocs(collectionRef);
-
-                    console.log('first point' + ' ' + elapsedTime);
+                    const querySnapshot = await getDocs(collection(db, 'Users'));
 
                     // Iterate over each document in the query snapshot
                     querySnapshot.forEach((docu) => {
@@ -674,13 +709,14 @@ export default new Vuex.Store({
                             // Modify the array (remove an element)
                             const updatedArray = dataArray.map((item, index) => { 
 
-                                if(item.taskID === taskID){  
-                                    return { ...item, taskTime: elapsedTime}
+                                if(item.taskID == taskID){  
+                                    return { ...item, taskTime: item.taskTime + elapsedTime}
                                 }else{
                                     return item
                                 }
 
                             });
+
 
                             // Update the document with the modified array
                             updateDoc(docRef, { userTasks: updatedArray });
@@ -691,6 +727,7 @@ export default new Vuex.Store({
                         }
                     
                     });
+
                 }catch(err){
                     console.log(err)
                 }
@@ -701,7 +738,7 @@ export default new Vuex.Store({
                     const updatedArray = local.map((item, index) => { 
 
                         if(item.taskID === taskID){  
-                            return { ...item, taskTime: elapsedTime}
+                            return { ...item, taskTime: item.taskTime + elapsedTime}
                         }else{
                             return item
                         }
@@ -709,14 +746,13 @@ export default new Vuex.Store({
                     });
 
                     commit('setUserTasks', updatedArray);
-                    commit('setPendingUserTasks', updatedArray);
+                    commit('setPendingTaskChanges', updatedArray);
                 }
             }
 
         },
         async graphDate({commit}, {time}){
 
-            //FIXME fix mapping
             const date = new Date().getDate();
             const thisMonth = new Date().getMonth();
             const thisYear = new Date().getFullYear();
@@ -724,8 +760,20 @@ export default new Vuex.Store({
             const today = new Date(`${thisYear}-${thisMonth}-${date}`);
             
             const getISOWeek = (date) => {
-                const onejan = new Date(date.getFullYear(), 0, 1);
-                return Math.ceil(((date - onejan) / 86400000 + onejan.getDay() + 1) / 7);
+
+                const month = ['jan','feb','mar','apr','may','jun','jul','aug','sept','oct','nov','dec']
+
+                const weekStartDate = date;
+
+                weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay()); // Start of week
+
+                const weekEndDate = new Date(weekStartDate);
+
+                weekEndDate.setDate(weekEndDate.getDate() + 6); // End of week
+
+                const weekRange = `${month[weekEndDate.getMonth() + 1]} ${weekStartDate.toISOString().slice(8, 10)} - ${weekEndDate.toISOString().slice(8, 10)} ${weekEndDate.getFullYear()}`;
+                
+                return weekRange
             }
             const thisWeek = getISOWeek(today);
 
@@ -847,9 +895,31 @@ export default new Vuex.Store({
 
             }
         },
-        updateTimer({commit}, {taskID, bol}){
-            commit('setPlayingTimer', { taskID : taskID, bol : bol});
-        }
+
+        //time actions
+        startTimer({commit}, {taskID, start}){
+
+            commit('setPlaying', {taskID : taskID, bol : true,  
+
+                taskInterval :  setInterval(()=>{
+
+                this.dispatch('graphDate',{
+                    time: 1000
+                });
+
+                this.dispatch('updateTime', {
+                    elapsedTime : 1000, 
+                    taskID : taskID
+                });
+                
+            }, 1000)});
+        },
+        pauseTime({commit}, taskID){
+
+            clearInterval(this.state.playingTimer[taskID].taskInterval);
+            commit('setPause', {taskID : taskID, taskInterval : null, bol : false});
+
+        },
     
     },
     getters:{
@@ -882,7 +952,22 @@ export default new Vuex.Store({
             return state.saveComplete ? true : false;
         },
         timerState:(state) => (taskID)=>{
-            return state.playingTimer[taskID];
+            return state.playingTimer[taskID].isTiming !== undefined ? state.playingTimer[taskID].isTiming : null;
+            
+        },
+        taskTime:(state) => (taskID)=>{
+
+            let time
+            state.userTasks.forEach(task => {
+                if (task.taskID === taskID){
+                   return time =  task.taskTime !== undefined ? task.taskTime : null;
+                }else{
+                    null
+                }
+
+            });
+            return time; 
+            
         }
     }
 })

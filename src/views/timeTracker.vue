@@ -1,6 +1,6 @@
 <template>
     <div class="block h-[100%] min-h-[50vh] overflow-scroll">
-        <nav class="w-full flex flex-wrap mb-10 justify-between bg-[var(--background-color)] absolute top-0 left-0 z-40 py-3.5 pt-0 items-center">
+        <nav class="w-full flex flex-wrap justify-between bg-[var(--background-color)] absolute top-auto left-0 z-40 py-3.5 pt-0 items-center">
             <div class="text-[var(--text-m)]">
                 <small class="today capitalize me-5 sm:me-10 hidden sm:inline-block">
                     {{ clock }}
@@ -20,7 +20,7 @@
                 </h6>
             </div>
             <div class=" mt-20 " v-else v-for="(n , weekDate) in sortedTasks"  :key="weekDate">
-                <span class="this-week w-full px-1.5 py-3.5 bg-[var(--secondary-color)] block rounded-sm sticky top-[41px] z-20 backdrop-blur-md">
+                <span class="this-week w-full px-1.5 py-3.5 bg-[var(--secondary-color)] block rounded-sm sticky top-[36px] z-20 backdrop-blur-md">
                     <p class="tag-name text-[var(--text-m)] capitalize font-medium">
                         {{ weekDate }}
                     </p>
@@ -33,7 +33,7 @@
                         </span>
                         <hr class=" flex-1 border-[var(--text-l)]"/>
                     </span>
-                    <task  v-for="i in taskArr"  :tag="i.taskTag" :isCompleted="i.isCompleted" :tagColor="i.taskTagColor" :taskTime="i.taskTime" :taskID="i.taskID" :adderIsVisible="adderIsVisible" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" class="mb-3.5">
+                    <task  v-for="i in taskArr"  :tag="i.taskTag" :isCompleted="i.isCompleted" :tagColor="i.taskTagColor" :taskTime="i.taskTime" :taskID="i.taskID" :adderIsVisible="adderIsVisible" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" @updateMenuVisibility="updateMenuVisibility" :isVisible="activeMenus[i.taskID]" class="mb-3.5">
                         <template v-slot:task-name>
                             {{ i.taskName }}
                         </template>
@@ -67,6 +67,7 @@
                 sec: new Date().getSeconds(),
                 adderIsVisible : false,
                 taskMenuOpened : false,
+                activeMenus :{}
                 
             }
         },
@@ -94,14 +95,14 @@
 
                 weekEndDate.setDate(weekEndDate.getDate() + 6); // End of week
 
-                const weekRange = `${this.month[weekEndDate.getMonth()]} ${weekStartDate.toISOString().slice(8, 10)} - ${weekEndDate.toISOString().slice(8, 10)} ${weekEndDate.getFullYear()}`;
+                const weekRange = `${this.month[weekEndDate.getMonth() + 1]} ${weekStartDate.toISOString().slice(8, 10)} - ${weekEndDate.toISOString().slice(8, 10)} ${weekEndDate.getFullYear()}`;
                 
                 if (!tasksByWeek[weekRange]) {
                   tasksByWeek[weekRange] = {};
                 }
             
                 const taskDate = new Date(task.dateCreated);
-                const dayDate = taskDate.toISOString().slice(0, 10); // Extract YYYY-MM-DD
+                const dayDate = `${!isNaN(Number(taskDate.toISOString().slice(6, 8))) ? taskDate.toISOString().slice(9, 10) : taskDate.toISOString().slice(8, 10)}  ${ !isNaN(Number(taskDate.toISOString().slice(6, 8))) ? this.month[Number(taskDate.toISOString().slice(6, 8))]  : this.month[Number(taskDate.toISOString().slice(6, 7))]}`; // Extract YYYY-MM-DD
                 if (!tasksByWeek[weekRange][dayDate]) {
                   tasksByWeek[weekRange][dayDate] = [];
                 }
@@ -135,6 +136,33 @@
             updateTaskMenuOpened(newValue){
                 return this.taskMenuOpened = newValue;
             },
+            updateMenuVisibility(newValue){
+                for (let i in this.activeMenus){
+
+                    if( Number(i) !== Number(newValue.id)){
+                        this.activeMenus[i] = false
+                        
+                    }
+                    else{
+                        this.activeMenus[i] = newValue.value;
+                        console.log('yes')
+                    }
+                }
+
+                console.log(this.activeMenus);
+            }
+        },
+        watch:{
+            inCompletedLength(newValue, oldValue){
+                this.inCompletedTasks.forEach(elem => {
+                this.activeMenus[elem.taskID] = false;
+            });
+            }
+        },
+        created(){
+            this.inCompletedTasks.forEach(elem => {
+                this.activeMenus[elem.taskID] = false;
+            });
         },
         beforeMount(){
             return this.timeCounter();

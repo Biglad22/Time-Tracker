@@ -1,13 +1,14 @@
 <template>
-    <section class="hero-chart w-full h-[50%] mb-6">
+    <section class="hero-chart w-full box-border mb-[20px]">
+        <p class="capitalize text-center ">{{ this.$store.state.userData.userEmail }} </p>
         <lineChart class="max-h-full"/>
     </section>
-    <section class="w-full h-[50%] overflow-scroll relative">
-        <div class="flex flex-wrap p-3.5 w-full bg-[var(--background-color)] justify-center gap-[24px] fixed z-30 left-1/2 -translate-x-1/2">
+    <section class="w-full h-[50%] max-h-[50%] relative">
+        <div class="flex flex-wrap p-3.5 w-full bg-[var(--background-color)] justify-center gap-[24px] absolute z-30 left-1/2 top-[-1px] -translate-x-1/2">
             <button @click="state = 'ongoing', taskState = false" :class="state ==='ongoing' ? 'text-[var(--primary-color)]' : null"  type="button">ongoing</button>
             <button @click="state = 'completed', taskState = true" :class="state ==='completed' ? 'text-[var(--primary-color)]' : null" type="button">completed</button>
         </div>
-        <div class="main-body mt-[40px] overflow-scrol">
+        <div class="main-body max-h-[100%] h-[100%] min-h-[100%] pt-[40px] overflow-scroll">
             
             <div class="tag w-fit capitalize p-3  rounded-md bg-[var(--secondary-color)]">
                 <small class=" inline-block">
@@ -63,3 +64,9 @@
         
     }
 </script>
+<style scoped>
+    .hero-chart{
+        height: calc( 50% - 20px);
+        max-height: calc( 50% - 20px);
+    }
+</style>

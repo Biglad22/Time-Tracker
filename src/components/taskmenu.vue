@@ -4,8 +4,8 @@
             <button type="button" @click="updateTaskMenuOpened" class="p-3.5 pe-1.5 w-fit group h-fit bg-transparent border-0">
                 <moreMenu class="w-[2.0rem] : md:w-[2.4rem] h-auto" :isVisible="isVisible" />
             </button>
-            <button type="button" @click="updateTaskMenuOpened" class="p-3.5 pe-1.5 w-fit group h-fit bg-transparent border-0" :class="menuShowing ? 'block' : 'hidden'">
-                <span class="material-symbols-outlined p-1.5" @click="updateShowDesc">
+            <button type="button" @click="updateShowDescClose" class="p-3.5 pe-1.5 w-fit group h-fit bg-transparent border-0" :class="menuShowing ? 'block' : 'hidden'">
+                <span class="material-symbols-outlined p-1.5" >
                     expand_less
                 </span>
             </button>
@@ -54,49 +54,45 @@
             'isCompleted',
             'taskID',
             'adderIsVisible',
-            'taskMenuOpened'
+            'taskMenuOpened',
+            'isVisible'
         ],
         data(){
             return{
-                isVisible: false,
                 menuShowing: false
             }
         },
         methods:{
+            updateShowDescClose(){
+                this.menuShowing = !this.menuShowing;
+
+                return this.$emit('updateShowDesc',this.menuShowing);
+            },
             updateShowDesc(){
-                this.isVisible = this.isVisible ? false : this.isVisible
+                this.$emit('updateMenuVisibility', this.isVisible ? false : this.isVisible);
                 this.menuShowing = !this.menuShowing;
 
                 return this.$emit('updateShowDesc',this.menuShowing);
             },
             async deleteTask(){
-                this.isVisible = !this.isVisible;
+                this.$emit('updateMenuVisibility', !this.isVisible);
                 return await this.$store.dispatch('deleteTask', {taskID : this.taskID});
             },
             async updateCompleted(){
-                this.isVisible = !this.isVisible;
+                this.$emit('updateMenuVisibility', !this.isVisible);
                 return await this.$store.dispatch('updateCompleted', {taskID : this.taskID})
             },
             //FIXME fix menu closing
             updateTaskMenuOpened(){
-
-                this.isVisible = !this.isVisible;
-
-                let value = this.isVisible === true && this.taskMenuOpened === false ? true 
-                            : this.isVisible === true && this.taskMenuOpened === true ? true 
-                            : false;
-
-                return this.$emit('updateTaskMenuOpened', value);
+                this.$emit('updateMenuVisibility', !this.isVisible);
             }
         },
         watch:{
             adderIsVisible(newValue){
-                this.isVisible = this.isVisible ? !this.isVisible : this.isVisible;
-            },
-            taskMenuOpened(newValue){
-                return this.isVisible = newValue === true && this.isVisible ===true ? !this.isVisible : this.isVisible;
+                this.$emit('updateMenuVisibility', this.isVisible ? !this.isVisible : this.isVisible);
             }
-        }
+            
+        },
     }
 </script>
 <style>

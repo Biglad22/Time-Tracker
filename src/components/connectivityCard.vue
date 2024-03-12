@@ -3,7 +3,7 @@
       <p class="capitalize  w-full text-center" :class=" isConnected ? 'text-[#1401F9]' : 'text-[#D10000]' ">
         <slot name="main-msg"></slot>
       </p>
-      <small class=" capitalize text-[var(--text-m)] mt-2 block w-fit">
+      <small class=" capitalize text-[var(--text-light-m)] mt-2 block w-fit">
          <slot name="sec-msg"></slot>
       </small>
     </div>
