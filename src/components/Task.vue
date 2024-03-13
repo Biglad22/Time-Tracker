@@ -14,7 +14,7 @@
                 <p class="capitalize text-[var(--success-color)]" v-else>
                     Completed
                 </p>
-                <moreMenu :taskID="taskID" :taskMenuOpened="taskMenuOpened" @updateMenuVisibility="updateMenuVisibility" @updateTaskMenuOpened="updateTaskMenuOpened" :showDesc="showDesc" :isCompleted="isCompleted" @updateShowDesc="updateShowDesc" :isVisible="isVisible" :adderIsVisible="adderIsVisible"/>
+                <moreMenu :index="index" :taskID="taskID" :taskMenuOpened="taskMenuOpened" @updateMenuVisibility="updateMenuVisibility" @updateTaskMenuOpened="updateTaskMenuOpened" :showDesc="showDesc" :isCompleted="isCompleted" @updateShowDesc="updateShowDesc" :isVisible="isVisible" :adderIsVisible="adderIsVisible"/>
             </div>
         </div>
         <Transition name="menu">
@@ -96,7 +96,8 @@ export default{
         'taskTime',
         'adderIsVisible',
         'taskMenuOpened',
-        'isVisible'
+        'isVisible',
+        'index'
     ],
     methods:{
         updateShowDesc(newValue){

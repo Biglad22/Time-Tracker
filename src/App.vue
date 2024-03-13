@@ -121,32 +121,77 @@ export default {
 
         let isSaved = this.saved;
         this.isConnected = true;
-        
-        if (!isSaved){
 
-          this.connectMainMsg = 'oti wa online now';
-          this.connectSecMsg = 'all progress will be saved';
+        switch(this.saved){
+          case false:
+            this.connectMainMsg = 'oti wa online now';
+            this.connectSecMsg = 'all progress will be saved';
 
-          const warningCallBck = setTimeout(() => {
-            this.connectMainMsg = 'syncing data...';
-            this.connectSecMsg = 'all progress are being saved';
+            const warningCallBck = setTimeout(() => {
+              this.connectMainMsg = 'syncing data...';
+              this.connectSecMsg = 'all progress are being saved';
 
-            clearTimeout(warningCallBck);
+              clearTimeout(warningCallBck);
 
-          }, 3000);
+            }, 3000);
 
-        }else{
-          this.connectMainMsg = 'sync complete';
-          this.connectSecMsg = 'all progress have been saved';
+            break;
 
-          const warningCallBck = setTimeout(() => {
-            
-            this.connectionState = false;
-            
-            clearTimeout(warningCallBck);
+          case true:
+            this.connectMainMsg = 'oti wa online now';
+            this.connectSecMsg = 'all progress will be saved';
 
-          }, 5000);
+            const secWarningCallBck = setTimeout(() => {
+              this.connectMainMsg = 'syncing data...';
+              this.connectSecMsg = 'all progress are being saved';
+
+              clearTimeout(secWarningCallBck);
+
+            }, 3000);
+
+            const newTimeOut = setTimeout(()=>{
+              this.connectMainMsg = 'sync complete';
+              this.connectSecMsg = 'all progress have been saved';
+
+              clearTimeout(newTimeOut);
+
+              const thrWarningCallBck = setTimeout(() => {
+
+                this.connectionState = false;
+
+                clearTimeout(thrWarningCallBck);
+
+              }, 5000);
+            }, 3500);
+
+            break;
         }
+
+        // if (!isSaved && this.connectMainMsg = 'sync complete'){
+
+        //   this.connectMainMsg = 'oti wa online now';
+        //   this.connectSecMsg = 'all progress will be saved';
+
+        //   const warningCallBck = setTimeout(() => {
+        //     this.connectMainMsg = 'syncing data...';
+        //     this.connectSecMsg = 'all progress are being saved';
+
+        //     clearTimeout(warningCallBck);
+
+        //   }, 3000);
+
+        // }else{
+        //   this.connectMainMsg = 'sync complete';
+        //   this.connectSecMsg = 'all progress have been saved';
+
+        //   const warningCallBck = setTimeout(() => {
+            
+        //     this.connectionState = false;
+            
+        //     clearTimeout(warningCallBck);
+
+        //   }, 5000);
+        // }
       }
 
       await this.$store.commit('setNetwork', this.online);

@@ -33,7 +33,7 @@
                         </span>
                         <hr class=" flex-1 border-[var(--text-l)]"/>
                     </span>
-                    <task  v-for="i in taskArr"  :tag="i.taskTag" :isCompleted="i.isCompleted" :tagColor="i.taskTagColor" :taskTime="i.taskTime" :taskID="i.taskID" :adderIsVisible="adderIsVisible" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" @updateMenuVisibility="updateMenuVisibility" :isVisible="activeMenus[i.taskID]" class="mb-3.5">
+                    <task  v-for="(i, index) in taskArr"  :tag="i.taskTag" :isCompleted="i.isCompleted" :tagColor="i.taskTagColor" :taskTime="i.taskTime" :taskID="i.taskID" :adderIsVisible="adderIsVisible" :taskMenuOpened="taskMenuOpened" @updateTaskMenuOpened="updateTaskMenuOpened" @updateMenuVisibility="updateMenuVisibility" :isVisible="activeMenus[i.taskID]" :key="index" :index="index" class="mb-3.5">
                         <template v-slot:task-name>
                             {{ i.taskName }}
                         </template>
@@ -145,11 +145,9 @@
                     }
                     else{
                         this.activeMenus[i] = newValue.value;
-                        console.log('yes')
                     }
                 }
 
-                console.log(this.activeMenus);
             }
         },
         watch:{

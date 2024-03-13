@@ -2,7 +2,7 @@
     <div class="hidden-menu h-fit w-fit relative">
         <div class="flex flex-wrap gap-3.5">
             <button type="button" @click="updateTaskMenuOpened" class="p-3.5 pe-1.5 w-fit group h-fit bg-transparent border-0">
-                <moreMenu class="w-[2.0rem] : md:w-[2.4rem] h-auto" :isVisible="isVisible" />
+                <moreMenu class="w-[2.0rem] : md:w-[2.4rem] h-auto" :isVisible="isVisible" ref="taskMenu"/>
             </button>
             <button type="button" @click="updateShowDescClose" class="p-3.5 pe-1.5 w-fit group h-fit bg-transparent border-0" :class="menuShowing ? 'block' : 'hidden'">
                 <span class="material-symbols-outlined p-1.5" >
@@ -12,7 +12,7 @@
         </div>
 
         <Transition name="menu">
-            <div v-show="isVisible" class="flex flex-wrap w-max flex-col py-7 gap-1.5 justify-start items-start rounded-sm absolute -top-[calc(100% + 0.8rem)] right-2 card  bg-[var(--background-color)] z-30">
+            <div v-show="isVisible" class="flex flex-wrap w-max flex-col py-7 gap-1.5 justify-start items-start rounded-sm absolute right-2 card  bg-[var(--background-color)] z-30" :class="pos < 196 ? 'bottom-full' : 'top-full'" >
                 <button type="button" @click="updateCompleted" class="px-7 py-1.5 w-full hover:bg-[rgba(26,26,26,0.5)] text-left transition-all ease-in-out duration-500 flex flex-wrap items-center gap-10 justify-between" v-if="!isCompleted" >
                     <span class="uppercase text-[var(--success-color)]">
                         Completed
@@ -55,11 +55,13 @@
             'taskID',
             'adderIsVisible',
             'taskMenuOpened',
-            'isVisible'
+            'isVisible',
+            'index'
         ],
         data(){
             return{
-                menuShowing: false
+                menuShowing: false,
+                pos: null,
             }
         },
         methods:{
@@ -83,8 +85,20 @@
                 return await this.$store.dispatch('updateCompleted', {taskID : this.taskID})
             },
             //FIXME fix menu closing
-            updateTaskMenuOpened(){
+            updateTaskMenuOpened(event){
                 this.$emit('updateMenuVisibility', !this.isVisible);
+                this.updateMenuPosition(event) 
+            },
+            showMenu(index) {
+              this.activeMenu = index;
+              this.updateMenuPosition(index);
+            },
+            updateMenuPosition(event) {
+               console.log(event.clientY);
+               console.log(window.innerHeight);
+
+               this.pos = window.innerHeight - event.clientY;
+               
             }
         },
         watch:{
