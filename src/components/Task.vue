@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex flex-row flex-wrap gap-10 justify-between  items-center">
-            <p class=" capitalize font-normal transition-all duration-500" :class=" isTiming ? 'text-[var(--text-h)]' : 'text-[var(--text-m)]' ">
+            <p class=" capitalize font-normal transition-all duration-500 max-w-[40%] text-nowrap truncate ..." :class=" isTiming ? 'text-[var(--text-h)]' : 'text-[var(--text-m)]' ">
                 <slot name="task-name"></slot>
             </p>
             <div class="flex flex-row flex-wrap gap-3.5 items-center"> 
