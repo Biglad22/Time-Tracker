@@ -39,7 +39,7 @@
                     </p>
                     <div class="flex flex-wrap w-full gap-3 justify-between items-baseline">
                         <small class="text-[var(--text-m)]">
-                            {{ Math.floor( taskTime / 3600000 )}} worked 
+                            {{ Math.floor( taskTime / 3600000 )}}hrs : {{ Math.floor((taskTime % (1000 * 60 * 60)) / (1000 * 60)) }} mins worked 
                         </small>
                         <timer :start="taskTime" v-if="!isCompleted" :isCompleted="isCompleted" :taskID="taskID"  class=" flex sm:hidden" />
                     </div>

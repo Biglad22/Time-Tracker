@@ -164,8 +164,7 @@
         },
         beforeMount(){
             return this.timeCounter();
-        },
-        
+        }
 
     }   
 </script>
