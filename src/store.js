@@ -929,6 +929,9 @@ export default new Vuex.Store({
             }
             return state.userTasks;
         },
+        tasksLength : (state, getters) => {
+            return getters.allTasks.length;
+        },
         completedTasks : (state, getters) => {
             return getters.allTasks.filter(elem => {
                 return elem.isCompleted === true; 

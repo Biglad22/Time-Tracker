@@ -167,31 +167,7 @@ export default {
             break;
         }
 
-        // if (!isSaved && this.connectMainMsg = 'sync complete'){
-
-        //   this.connectMainMsg = 'oti wa online now';
-        //   this.connectSecMsg = 'all progress will be saved';
-
-        //   const warningCallBck = setTimeout(() => {
-        //     this.connectMainMsg = 'syncing data...';
-        //     this.connectSecMsg = 'all progress are being saved';
-
-        //     clearTimeout(warningCallBck);
-
-        //   }, 3000);
-
-        // }else{
-        //   this.connectMainMsg = 'sync complete';
-        //   this.connectSecMsg = 'all progress have been saved';
-
-        //   const warningCallBck = setTimeout(() => {
-            
-        //     this.connectionState = false;
-            
-        //     clearTimeout(warningCallBck);
-
-        //   }, 5000);
-        // }
+        
       }
 
       await this.$store.commit('setNetwork', this.online);

@@ -166,12 +166,6 @@
             return this.timeCounter();
         },
         
-        // created(){
-        //     document.addEventListener('keydown', this.newTask(Event));
-        // },
-        // beforeDestroy(){
-        //     document.removeEventListener('keydown', this.newTask(Event));
-        // }
 
     }   
 </script>

@@ -94,11 +94,7 @@
               this.updateMenuPosition(index);
             },
             updateMenuPosition(event) {
-               console.log(event.clientY);
-               console.log(window.innerHeight);
-
-               this.pos = window.innerHeight - event.clientY;
-               
+               this.pos = window.innerHeight - event.clientY;             
             }
         },
         watch:{
