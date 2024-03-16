@@ -84,7 +84,6 @@
                 this.$emit('updateMenuVisibility', !this.isVisible);
                 return await this.$store.dispatch('updateCompleted', {taskID : this.taskID})
             },
-            //FIXME fix menu closing
             updateTaskMenuOpened(event){
                 this.$emit('updateMenuVisibility', !this.isVisible);
                 this.updateMenuPosition(event) 

@@ -491,43 +491,50 @@ export default new Vuex.Store({
         },
         async deleteTask({commit}, {taskID}){
 
-            if (this.state.online){
-                // Reference to the collection
-                const collectionRef = collection(db, 'Users');
+            try{
 
-                // Get all documents in the collection
-                const querySnapshot = await getDocs(collectionRef);
+                if (this.state.online){
+                    // Reference to the collection
+                    const collectionRef = collection(db, 'Users');
 
-                const user = this.state.userId;
-                
-                // Iterate over each document in the query snapshot
-                querySnapshot.forEach((docu) => {
+                    // Get all documents in the collection
+                    const querySnapshot = await getDocs(collectionRef);
 
-                    // Get the document data
-                    const userID = docu.data().userID;
-                    const userData = docu.data()
+                    const user = this.state.userId;
 
-                    if (userID === user ){
-                        const docRef = doc(db, 'Users', docu.id);
-                    
-                        const dataArray = userData.userTasks;
-                        // Modify the array (remove an element)
-                        const userTasks = dataArray.filter((item, index) => item.taskID !== taskID);
+                    // Iterate over each document in the query snapshot
+                    querySnapshot.forEach((docu) => {
+
+                        // Get the document data
+                        const userID = docu.data().userID;
+                        const userData = docu.data()
+
+                        if (userID === user ){
+                            const docRef = doc(db, 'Users', docu.id);
+                        
+                            const dataArray = userData.userTasks;
+                            // Modify the array (remove an element)
+                            const userTasks = dataArray.filter((item, index) => item.taskID !== taskID);
 
 
-                        // Update the document with the modified array
-                        updateDoc(docRef, { userTasks: userTasks });
+                            // Update the document with the modified array
+                            updateDoc(docRef, { userTasks: userTasks });
 
-                        this.dispatch('getUserData');
-                    }
+                            this.dispatch('getUserData');
+                        }
 
-                });
-            }else{
-                let userTasks = JSON.parse(localStorage.getItem('userTasks'));
-                const newUserTasks = userTasks.filter((item, index) => item.taskID !== taskID);
+                    });
+                }else{
+                    let userTasks = JSON.parse(localStorage.getItem('userTasks'));
+                    const newUserTasks = userTasks.filter((item, index) => item.taskID !== taskID);
 
-                this.dispatch('getUserData');
-                commit('setPendingTaskChanges', newUserTasks);
+                    commit('setPendingTaskChanges', newUserTasks);
+                    commit('setUserTasks', newUserTasks);
+                    this.dispatch('getUserData');
+
+                }
+            }catch(err){
+                console.log(err);
             }
         },
         async updateCompleted({commit}, {taskID}){
